@@ -1,27 +1,51 @@
 #!/bin/bash
 
+_build() {
+  poetry build --ansi
+}
+
+_init() {
+  poetry install --remove-untracked --no-root --ansi
+}
+
 _lint() {
-  black .
+  poetry run black .
+}
+
+_run() {
+  poetry run flatplan --debug
 }
 
 _test() {
-  pipenv install --dev --clear --three
-  pipenv run pytest tests/
+  poetry run pytest tests/
 }
 
-action="$INPUT_ACTION"
+action="all"
 
-if [ -z "$action" ]; then
-  action="all"
+if [  "$ENTRYPOINT_ACTION" != "" ]; then
+  action="$ENTRYPOINT_ACTION"
 fi
+
+if [ "$1" != "" ]; then
+  action="$1"
+fi
+
+_init
 
 case "$action" in
   "all")
     _lint
     _test
+    _build
+  ;;
+  "build")
+    _build
   ;;
   "lint")
     _lint
+  ;;
+  "run")
+    _run
   ;;
   "test")
     _test

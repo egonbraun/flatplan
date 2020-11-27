@@ -1,24 +1,34 @@
-FROM python:3.8.6-buster
+FROM python:3.9.0-buster
 
-LABEL "maintainer" = "Egon Braun <egonbraun@gmail.com>"
+LABEL "maintainer" = "Egon Braun <egon@mundoalem.io>"
 
-ARG BLACK_VERSION="20.8b1"
-ARG PIPENV_VERSION="2020.8.13"
-ARG PIPX_VERSION="0.15.5.1"
-ARG PYTEST_VERSION="6.1.1"
+ARG USER_ID
+ARG GROUP_ID
 
-ENV PATH="/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-ENV PIPENV_VENV_IN_PROJECT=1
+ENV PATH="/home/developer/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-RUN pip  install "pipx==$PIPX_VERSION"     && \
-    pipx install "black==$BLACK_VERSION"   && \
-    pipx install "pipenv==$PIPENV_VERSION" && \
-    pipx install "pytest==$PYTEST_VERSION"
+RUN addgroup --gid $GROUP_ID developer
+RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID developer
 
-VOLUME /opt/src
+USER developer
 
-WORKDIR /opt/src
+RUN mkdir /home/developer/src
 
-ENTRYPOINT ["/opt/src/entrypoint.sh"]
+WORKDIR /home/developer/src
+
+RUN pip  install "pipx==0.15.6.0"
+RUN pipx install "black==20.8b1"
+RUN pipx install "poetry==1.1.4"
+RUN pipx install "pytest==6.1.2"
+
+COPY --chown=developer:developer . /home/developer/src
+
+RUN poetry install --remove-untracked --no-root --ansi
+RUN poetry run pip freeze > requirements.txt
+RUN pip install -r requirements.txt
+
+VOLUME /home/developer/src
+
+CMD ["/home/developer/src/entrypoint.sh"]
