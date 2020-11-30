@@ -42,7 +42,7 @@ def _run(
         fp_out = open(output, "w+", encoding=DEFAULT_ENCODING)
 
     json_in = fp_in.read()
-    flattener = PlanFlattener(json_in,  logger=logger)
+    flattener = PlanFlattener(json_in, logger=logger)
     json_out = flattener.flatten()
     fp_out.write(f"{json_out}\n")
     fp_in.close()

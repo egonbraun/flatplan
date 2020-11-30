@@ -23,7 +23,7 @@ class TestFlatplan(unittest.TestCase):
     def setUp(self) -> None:
         example_plan_path = join(dirname(abspath(__file__)), "assets/plan.json")
 
-        with open(example_plan_path, "r")  as plan:
+        with open(example_plan_path, "r") as plan:
             json_plan = plan.read()
             self.flattener = flatplan.PlanFlattener(json_plan)
 
