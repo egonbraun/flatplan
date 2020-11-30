@@ -1,35 +1,17 @@
-# Python Project Template
+Flatplan
+========
 
-A template you can use to bootstrap Python projects.
+Flatplan is a command line tool that can be used to *flatten* the resources and
+providers found in a terraform plan in JSON format. You can obtain it by first
+export your plan file by running:
 
-Software supported:
+``$ terraform plan -out=planfile``
 
-| Software | Version |
-|----------|---------|
-|black     |20.8b1   |
-|pipenv    |2020.8.13|
-|pipx      |0.15.5.1 |
-|pytest    |6.1.1    |
+And then:
 
-## Features
+``$ terraform show -json planfile > plan.json``
 
-## `.gitignore`
+Now, we can feed flatplan with the exported plan:
 
-The `.gitignore` is configured for Python.
+``$ flatplan --jsonplan=plan.json --output=flattened_plan.json --debug``
 
-## `Pipfile`
-
-The `Pipfile` is configured for `pipenv` use.
-
-## Directories
-
-- `src/` for application source code
-- `tests/` for application tests' source code
-
-## License
-
-GNU General Public License Version 3, 29 June 2007.
-
-## Pipeline
-
-Github actions for linting and testing setup.
