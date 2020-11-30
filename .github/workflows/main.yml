@@ -11,3 +11,10 @@ jobs:
       uses: egonbraun/python-lint-action@v1.1.0
     - name: Test
       uses: egonbraun/python-unittest-action@v1.1.0
+    - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifacts
+          path: |
+            dist/*.tar.gz
+            dist/*.whl
