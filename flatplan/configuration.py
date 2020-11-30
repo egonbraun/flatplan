@@ -12,3 +12,5 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Flatplan.  If not, see <https://www.gnu.org/licenses/>.
+
+DEFAULT_ENCODING: str = "utf-8"
