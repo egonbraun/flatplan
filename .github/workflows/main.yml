@@ -10,4 +10,4 @@ jobs:
     - name: Lint
       uses: egonbraun/python-lint-action@v1.0.0
     - name: Test
-      uses: egonbraun/python-unittest-action@v1.0.0
+      uses: egonbraun/python-unittest-action@v1.1.0
