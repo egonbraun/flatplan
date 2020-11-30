@@ -12,9 +12,9 @@ jobs:
     - name: Test
       uses: egonbraun/python-unittest-action@v1.1.0
     - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-artifacts
-          path: |
-            dist/*.tar.gz
-            dist/*.whl
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-artifacts
+        path: |
+          dist/*.tar.gz
+          dist/*.whl
