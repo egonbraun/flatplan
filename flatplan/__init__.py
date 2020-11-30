@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Flatplan.  If not, see <https://www.gnu.org/licenses/>.
 
-from .flattener import Flattener, PlanFlattener
+from .flattener import Flattener
 from .main import main
 
 assert Flattener, PlanFlattener

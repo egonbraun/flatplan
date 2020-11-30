@@ -25,7 +25,7 @@ class TestFlatplan(unittest.TestCase):
 
         with open(example_plan_path, "r") as plan:
             json_plan = plan.read()
-            self.flattener = flatplan.PlanFlattener(json_plan)
+            self.flattener = flatplan.Flattener(json_plan)
 
     def test_plan_flattener(self) -> None:
         json_output = self.flattener.flatten()

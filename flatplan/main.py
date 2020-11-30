@@ -18,7 +18,7 @@ import fire
 from sys import exit, stdin, stdout
 from typing import Optional
 from .configuration import DEFAULT_ENCODING
-from .flattener import PlanFlattener
+from .flattener import Flattener
 from .logging import setup_logger
 
 
@@ -27,6 +27,25 @@ def _run(
     output: Optional[str] = "",
     debug: Optional[bool] = False,
 ) -> None:
+    """
+    Starts the execution of the Flatplan application.
+
+    Parameters
+    ----------
+    jsonplan : str, optional
+        a path pointing to the location of the terraform plan in JSON format, default it reads from stdin
+
+    output : str, optional
+        a file path where we will save the flattened plan file in JSON format, default it writes to stdout
+
+    debug : bool, optional
+        whether we show debug log messages or not, default: false
+
+    Returns
+    -------
+    None.
+    """
+
     logger = setup_logger("flatplan", debug)
     fp_in = stdin
     fp_out = stdout
@@ -42,7 +61,7 @@ def _run(
         fp_out = open(output, "w+", encoding=DEFAULT_ENCODING)
 
     json_in = fp_in.read()
-    flattener = PlanFlattener(json_in, logger=logger)
+    flattener = Flattener(json_in, logger=logger)
     json_out = flattener.flatten()
     fp_out.write(f"{json_out}\n")
     fp_in.close()
@@ -52,6 +71,17 @@ def _run(
 
 
 def main() -> None:
+    """
+    A wrapper for the _run function also providing CLI parameter parsing.
+
+    Parameters
+    ----------
+    None.
+
+    Returns
+    -------
+    None.
+    """
     fire.Fire(_run)
     exit(0)
 

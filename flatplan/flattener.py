@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Flatplan.  If not, see <https://www.gnu.org/licenses/>.
 
-from abc import ABC, abstractmethod
 from copy import deepcopy
 from json import loads, dumps
 from logging import Logger
@@ -21,23 +20,51 @@ from typing import Any, List, Optional
 from .logging import setup_logger
 
 
-class Flattener(ABC):
-    @abstractmethod
-    def flatten(self) -> str:
-        pass
+class Flattener:
+    """
+    A class that can be used to flatten Terraform plans in JSON format.
 
+    ...
 
-class PlanFlattener(Flattener):
+    Methods
+    -------
+    flatten() -> str :
+        flattens the plan and returns the processed result
+    """
+
     _plan: Any
     _logger: Logger
 
     def __init__(self, json_plan: str, logger: Optional[Logger] = None) -> None:
+        """
+        Constructs all the necessary attributes for the Flattener object.
+
+        Parameters
+        ----------
+        json_plan : str
+            the terraform plan in JSON format
+
+        logger : logging.Logger, optional
+            the logger object to be used
+        """
         self._plan = loads(json_plan)
         self._logger = (
             logger if logger is not None else setup_logger("plan-flattener", debug=True)
         )
 
     def _flatten_child_modules(self, modules: List) -> List:
+        """
+        Recursively traverses the plan and creates a list with all resources found in child modules.
+
+        Parameters
+        ----------
+        modules : List
+            List of modules from JSON field 'planned_values.root_module.child_modules'
+
+        Returns
+        -------
+        resources : List
+        """
         resources = []
 
         for module in modules:
@@ -61,6 +88,17 @@ class PlanFlattener(Flattener):
         return resources
 
     def _flatten_providers(self) -> List:
+        """
+        Traverses the plan and creates a list with all providers found.
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        providers : List
+        """
         providers = []
 
         if "configuration" in self._plan.keys():
@@ -85,6 +123,17 @@ class PlanFlattener(Flattener):
         return providers
 
     def _flatten_resources(self) -> List:
+        """
+        Traverses the plan and creates a list with all resources found.
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        resources : List
+        """
         resources = []
 
         if "planned_values" in self._plan.keys():
@@ -126,10 +175,23 @@ class PlanFlattener(Flattener):
         return resources
 
     def flatten(self) -> str:
+        """
+        Traverses the plan and creates a new flattened plan with all resources and providers found.
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        flattened_plan : str
+        """
         self._logger.debug("Flattening providers")
         providers = self._flatten_providers()
 
         self._logger.debug("Flattening resources")
         resources = self._flatten_resources()
 
-        return dumps({"providers": providers, "resources": resources})
+        flattened_plan = dumps({"providers": providers, "resources": resources})
+
+        return flattened_plan

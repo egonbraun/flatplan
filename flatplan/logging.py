@@ -18,6 +18,16 @@ from typing import Optional
 
 
 def setup_logger(name: str, debug: Optional[bool] = False) -> logging.Logger:
+    """
+    Creates a logger object
+
+    Parameters:
+        name (str): The name of the logger, usually is the name of the application, class or method
+        debug (bool): Whether we show debug log messages or not, default: false
+
+    Returns:
+         logger (logging.Logger): An object to be used to print out log messages
+    """
     logger = logging.getLogger(name)
     level = "DEBUG" if debug else "INFO"
 
