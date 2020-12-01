@@ -30,4 +30,4 @@ jobs:
         name: build-artifacts
         path: dist
     - name: Release
-        uses: egonbraun/python-release-action@v1.0.0
+      uses: egonbraun/python-release-action@v1.0.0
