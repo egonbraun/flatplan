@@ -1,9 +1,9 @@
 on: [push]
 
 jobs:
-  ci:
+  pipeline:
     runs-on: ubuntu-latest
-    name: Pipeline CI
+    name: Pipeline
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -20,10 +20,6 @@ jobs:
         path: |
           dist/*.tar.gz
           dist/*.whl
-  cd:
-    runs-on: ubuntu-latest
-    name: Pipeline CD
-    steps:
     - name: Download Artifacts
       uses: actions/download-artifact@v2
       with:
