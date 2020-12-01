@@ -1,9 +1,9 @@
 on: [push]
 
 jobs:
-  pipeline:
+  ci:
     runs-on: ubuntu-latest
-    name: Pipeline
+    name: CI
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -20,13 +20,24 @@ jobs:
         path: |
           dist/*.tar.gz
           dist/*.whl
+  cd:
+    runs-on: ubuntu-latest
+    name: CD
+    needs: ci
+    steps:
+    - name: Preparation
+      run: mkdir dist
     - name: Download Artifacts
       uses: actions/download-artifact@v2
       with:
         name: build-artifacts
         path: dist/
+    - name: Display structure of downloaded files
+      run: ls -laR
+      working-directory: dist/
     - name: Release
       uses: egonbraun/python-release-action@v1.0.0
+      if: startsWith( github.ref, "refs/tags/releases/")
       with:
         username: ${{secrets.PYPI_USERNAME}}
         password: ${{secrets.PYPI_PASSWORD}}
