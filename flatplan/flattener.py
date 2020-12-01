@@ -68,6 +68,8 @@ class Flattener:
         resources = []
 
         for module in modules:
+            module_address = module["address"] if "address" in module.keys() else "unknown"
+
             if "resources" in module.keys():
                 for resource in module["resources"]:
                     resource_address = (
@@ -78,12 +80,12 @@ class Flattener:
                     self._logger.debug(f"Adding resource: {resource_address}")
                     resources.append(deepcopy(resource))
             else:
-                self._logger.debug("No resources found in child module")
+                self._logger.debug(f"No resources found in module: {module_address}")
 
             if "child_modules" in module.keys():
                 resources.extend(self._flatten_child_modules(module["child_modules"]))
             else:
-                self._logger.debug("No child modules found in module")
+                self._logger.debug(f"No child modules found in module: {module_address}")
 
         return resources
 
