@@ -13,7 +13,7 @@ _lint() {
 }
 
 _run() {
-  poetry run flatplan --debug
+  poetry run flatplan --debug --jsonplan=tests/assets/plan.json
 }
 
 _test() {
