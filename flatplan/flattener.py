@@ -68,7 +68,9 @@ class Flattener:
         resources = []
 
         for module in modules:
-            module_address = module["address"] if "address" in module.keys() else "unknown"
+            module_address = (
+                module["address"] if "address" in module.keys() else "unknown"
+            )
 
             if "resources" in module.keys():
                 for resource in module["resources"]:
@@ -85,7 +87,9 @@ class Flattener:
             if "child_modules" in module.keys():
                 resources.extend(self._flatten_child_modules(module["child_modules"]))
             else:
-                self._logger.debug(f"No child modules found in module: {module_address}")
+                self._logger.debug(
+                    f"No child modules found in module: {module_address}"
+                )
 
         return resources
 
