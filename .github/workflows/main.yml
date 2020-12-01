@@ -32,7 +32,7 @@ jobs:
         path: dist/
     - name: Release
       uses: egonbraun/python-release-action@v1.0.0
-      if: startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/tags/v')
       with:
         username: ${{ secrets.PYPI_USERNAME }}
         password: ${{ secrets.PYPI_PASSWORD }}
