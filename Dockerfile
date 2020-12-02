@@ -16,8 +16,6 @@ USER developer
 
 RUN mkdir /home/developer/src
 
-WORKDIR /home/developer/src
-
 RUN pip  install "pipx==0.15.6.0"
 RUN pipx install "black==20.8b1"
 RUN pipx install "poetry==1.1.4"
@@ -25,9 +23,17 @@ RUN pipx install "pytest==6.1.2"
 
 COPY --chown=developer:developer . /home/developer/src
 
+WORKDIR /home/developer/src
+
 RUN poetry install --remove-untracked --no-root --ansi
 RUN poetry run pip freeze > requirements.txt
 RUN pip install -r requirements.txt
+
+WORKDIR /home/developer
+
+RUN rm -rf /home/developer/src
+
+WORKDIR /home/developer/src
 
 VOLUME /home/developer/src
 
