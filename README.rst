@@ -4,27 +4,26 @@ Flatplan
 
 .. image:: https://github.com/egonbraun/flatplan/workflows/CI/badge.svg
 
-Flatplan is a command line tool that can be used to *flatten* the resources and
-providers found in a terraform plan in JSON format. You can obtain it by first
-export your plan file by running:
+Flatplan is a command line tool that can be used to *flatten* the resources and providers found inside a terraform plan.
+You can obtain a JSON version of the plan by running:
 
-``$ terraform plan -out=planfile``
+.. sourcecode::
 
-And then:
+    $ terraform plan -out=planfile
+    $ terraform show -json planfile > plan.json
 
-``$ terraform show -json planfile > plan.json``
+Now, we can feed our exported JSON plan to flatplan:
 
-Now, we can feed flatplan with the exported plan:
+.. sourcecode::
 
-``$ flatplan --jsonplan=plan.json --output=flattened_plan.json --debug``
+    $ flatplan --jsonplan=plan.json --output=flattened_plan.json --debug
 
-The problem we are trying to solve with this tool is that, when you export the plan
-to JSON the resources might be in different locations which makes it hard for other
-tools to find them. Therefor, flatplan will extract all resources and providers and
-return a simpler JSON structure for you.
+The problem we are trying to solve with flatplan is that, when you export the plan to JSON the resources might be in
+different locations which makes it hard for other tools to find them. Therefore, flatplan will extract all resources and
+providers for you and return a much simpler JSON structure.
 
-For example, the usual structure of a terraform plan that uses modules and perhaps
-those modules use submodules would be something like this:
+For example, let's say we have a complex terraform project that uses many modules and submodules. When we create the
+plan file for this project and then export it to JSON we might end up with something like this:
 
 .. sourcecode::
 
@@ -77,9 +76,8 @@ those modules use submodules would be something like this:
         }
     }
 
-As you can see this recursive nature of the plan can get quite ugly if you use
-a lot of modules and submodules. When you run flatplan will then extract all
-resources and providers and output something like this:
+As you can see this recursive nature of the plan can get quite ugly if you use a lot of modules and submodules. After,
+flatplan process this file we will get:
 
 .. sourcecode::
 
@@ -89,8 +87,8 @@ resources and providers and output something like this:
     }
 
 
-This makes it easy for tools like Open Policy Agent that have no way to recursively
-traverse a JSON file.
+This makes it easy for tools like Open Policy Agent to process our file since it has no way to recursively traverse a
+raw terraform plan.
 
 -------
 Install
