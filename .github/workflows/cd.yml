@@ -45,6 +45,7 @@ jobs:
         python-version: [3.9]
         os: [ubuntu-20.04]
     name: Release
+    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v2

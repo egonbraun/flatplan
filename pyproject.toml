@@ -21,7 +21,7 @@ exclude = '''
 
 [tool.poetry]
 name = "flatplan"
-version = "1.0.1"
+version = "1.0.2"
 description = "Flatplan is a tool that groups all resources and providers specified in a Terraform plan file into a list"
 authors = ["Egon Braun <egon@mundoalem.io>"]
 license = "GPLv3"
