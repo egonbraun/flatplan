@@ -27,7 +27,8 @@ return a simpler JSON structure for you.
 For example, the usual structure of a terraform plan that uses modules and perhaps
 those modules use submodules would be something like this:
 
-.. code:: json
+.. sourcecode::
+
     {
         ...
         "planned_values": {
@@ -81,7 +82,8 @@ As you can see this recursive nature of the plan can get quite ugly if you use
 a lot of modules and submodules. When you run flatplan will then extract all
 resources and providers and output something like this:
 
-.. code:: json
+.. sourcecode::
+
     {
         "resources": [ ... all resources here ... ],
         "providers": [ ... all providers here ... ]
