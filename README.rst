@@ -1,8 +1,9 @@
-.. image:: https://github.com/egonbraun/flatplan/workflows/CI/badge.svg
-.. image:: https://github.com/egonbraun/flatplan/workflows/CD/badge.svg
-
+========
 Flatplan
 ========
+
+.. image:: https://github.com/egonbraun/flatplan/workflows/CI/badge.svg
+.. image:: https://github.com/egonbraun/flatplan/workflows/CD/badge.svg
 
 Flatplan is a command line tool that can be used to *flatten* the resources and
 providers found in a terraform plan in JSON format. You can obtain it by first
@@ -27,14 +28,10 @@ For example, the usual structure of a terraform plan that uses modules and perha
 those modules use submodules would be something like this:
 
 .. code:: json
-{
-    ...
-    "planned_values": {
-        "root_module": {
-            "resources": [
-                ... a lot of resources here ...
-            ],
-            "child_modules": [{
+    {
+        ...
+        "planned_values": {
+            "root_module": {
                 "resources": [
                     ... a lot of resources here ...
                 ],
@@ -43,53 +40,58 @@ those modules use submodules would be something like this:
                         ... a lot of resources here ...
                     ],
                     "child_modules": [{
-                        ... and so on ...
+                        "resources": [
+                            ... a lot of resources here ...
+                        ],
+                        "child_modules": [{
+                            ... and so on ...
+                        }]
                     }]
-                }]
-            }, {
-                "resources": [
-                    ... a lot of resources here ...
-                ],
-                "child_modules": [{
+                }, {
                     "resources": [
                         ... a lot of resources here ...
                     ],
                     "child_modules": [{
-                        ... and so on ...
+                        "resources": [
+                            ... a lot of resources here ...
+                        ],
+                        "child_modules": [{
+                            ... and so on ...
+                        }]
                     }]
                 }]
-            }]
-        }
-    },
-    ...
-    "configuration": {
-        "provider_config": {
-            "aws": {
-                "name": "aws",
-                "expressions": {
-                    "region": {
-                        "constant_value": "us-east-1"
+            }
+        },
+        ...
+        "configuration": {
+            "provider_config": {
+                "aws": {
+                    "name": "aws",
+                    "expressions": {
+                        "region": {
+                            "constant_value": "us-east-1"
+                        }
                     }
                 }
             }
         }
     }
-}
 
 As you can see this recursive nature of the plan can get quite ugly if you use
 a lot of modules and submodules. When you run flatplan will then extract all
 resources and providers and output something like this:
 
 .. code:: json
-{
-    "resources": [ ... all resources here ... ],
-    "providers": [ ... all providers here ... ]
-}
+    {
+        "resources": [ ... all resources here ... ],
+        "providers": [ ... all providers here ... ]
+    }
 
 
 This makes it easy for tools like Open Policy Agent that have no way to recursively
 traverse a JSON file.
 
+-------
 Install
 -------
 
@@ -101,6 +103,7 @@ If you use pipx:
 
 ``$ pipx install flatplan``
 
+-----
 Usage
 -----
 
