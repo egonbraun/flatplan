@@ -1,13 +1,9 @@
 name: CD
 
 on:
-  workflow_run:
-    workflows:
-      - CI
+  release:
     types:
-      - completed
-    tags:
-      - v*
+      - created
 
 jobs:
   build:
