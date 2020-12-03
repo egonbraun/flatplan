@@ -3,7 +3,6 @@ Flatplan
 ========
 
 .. image:: https://github.com/egonbraun/flatplan/workflows/CI/badge.svg
-.. image:: https://github.com/egonbraun/flatplan/workflows/CD/badge.svg
 
 Flatplan is a command line tool that can be used to *flatten* the resources and
 providers found in a terraform plan in JSON format. You can obtain it by first
