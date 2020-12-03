@@ -15,6 +15,7 @@
 # along with Flatplan.  If not, see <https://www.gnu.org/licenses/>.
 
 import fire
+from os.path import expanduser
 from sys import exit, stdin, stdout
 from typing import Optional
 from .configuration import DEFAULT_ENCODING
@@ -54,11 +55,11 @@ def _run(
 
     if jsonplan:
         logger.debug(f"Reading plan from {jsonplan}")
-        fp_in = open(jsonplan, "r", encoding=DEFAULT_ENCODING)
+        fp_in = open(expanduser(jsonplan), "r", encoding=DEFAULT_ENCODING)
 
     if output:
         logger.debug(f"Output will be saved to {output}")
-        fp_out = open(output, "w+", encoding=DEFAULT_ENCODING)
+        fp_out = open(expanduser(output), "w+", encoding=DEFAULT_ENCODING)
 
     json_in = fp_in.read()
     flattener = Flattener(json_in, logger=logger)
