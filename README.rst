@@ -1,3 +1,6 @@
+.. image:: https://github.com/egonbraun/flatplan/workflows/CI/badge.svg
+.. image:: https://github.com/egonbraun/flatplan/workflows/CD/badge.svg
+
 Flatplan
 ========
 
@@ -14,6 +17,78 @@ And then:
 Now, we can feed flatplan with the exported plan:
 
 ``$ flatplan --jsonplan=plan.json --output=flattened_plan.json --debug``
+
+The problem we are trying to solve with this tool is that, when you export the plan
+to JSON the resources might be in different locations which makes it hard for other
+tools to find them. Therefor, flatplan will extract all resources and providers and
+return a simpler JSON structure for you.
+
+For example, the usual structure of a terraform plan that uses modules and perhaps
+those modules use submodules would be something like this:
+
+.. code:: json
+{
+    ...
+    "planned_values": {
+        "root_module": {
+            "resources": [
+                ... a lot of resources here ...
+            ],
+            "child_modules": [{
+                "resources": [
+                    ... a lot of resources here ...
+                ],
+                "child_modules": [{
+                    "resources": [
+                        ... a lot of resources here ...
+                    ],
+                    "child_modules": [{
+                        ... and so on ...
+                    }]
+                }]
+            }, {
+                "resources": [
+                    ... a lot of resources here ...
+                ],
+                "child_modules": [{
+                    "resources": [
+                        ... a lot of resources here ...
+                    ],
+                    "child_modules": [{
+                        ... and so on ...
+                    }]
+                }]
+            }]
+        }
+    },
+    ...
+    "configuration": {
+        "provider_config": {
+            "aws": {
+                "name": "aws",
+                "expressions": {
+                    "region": {
+                        "constant_value": "us-east-1"
+                    }
+                }
+            }
+        }
+    }
+}
+
+As you can see this recursive nature of the plan can get quite ugly if you use
+a lot of modules and submodules. When you run flatplan will then extract all
+resources and providers and output something like this:
+
+.. code:: json
+{
+    "resources": [ ... all resources here ... ],
+    "providers": [ ... all providers here ... ]
+}
+
+
+This makes it easy for tools like Open Policy Agent that have no way to recursively
+traverse a JSON file.
 
 Install
 -------
@@ -39,5 +114,5 @@ Flatplan accepts the following command line parameters:
 
 Example:
 
-``$ flatplan --jsonplan=~/plan.json --output=~/flattened.json --debug``
+``$ flatplan --jsonplan=plan.json --output=flattened.json --debug``
 
