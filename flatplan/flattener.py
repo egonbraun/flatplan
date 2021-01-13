@@ -49,7 +49,7 @@ class Flattener:
         """
         self._plan = loads(json_plan)
         self._logger = (
-            logger if logger is not None else setup_logger("plan-flattener", debug=True)
+            logger if logger is not None else setup_logger("flatplan", debug=True)
         )
 
     def _flatten_child_modules(self, modules: List) -> List:
