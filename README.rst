@@ -16,7 +16,7 @@ Now, we can feed our exported JSON plan to flatplan:
 
 .. sourcecode::
 
-    $ flatplan --jsonplan=plan.json --output=flattened_plan.json --debug
+    $ flatplan --plan=plan.json --output=flattened_plan.json --debug
 
 The problem we are trying to solve with flatplan is that, when you export the plan to JSON the resources might be in
 different locations which makes it hard for other tools to find them. Therefore, flatplan will extract all resources and
@@ -108,13 +108,15 @@ Usage
 
 Flatplan accepts the following command line parameters:
 
-``--jsonplan="path"``: Reads JSON plan from the specified path, default: STDIN.
+``--debug``: Sets log level to debug, default: False.
 
 ``--output="path"``: Writes flattened plan to the specified path, default: STDOUT.
 
-``--debug``: Sets log level to debug, default: False.
+``--plan="path"``: Reads JSON plan from the specified path, default: STDIN.
+
+``--remove="tag=value"``: Removes the resources that contain a certain tag, default: empty
 
 Example:
 
-``$ flatplan --jsonplan=plan.json --output=flattened.json --debug``
+``$ flatplan --debug --output=flattened.json --plan=plan.json --remove="remove=true"``
 
