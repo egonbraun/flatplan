@@ -14,7 +14,6 @@
 # along with Flatplan.  If not, see <https://www.gnu.org/licenses/>.
 
 import flatplan
-import json
 import unittest
 from os.path import abspath, dirname, join
 
@@ -23,27 +22,23 @@ class TestFlatplan(unittest.TestCase):
     def setUp(self) -> None:
         example_plan_path = join(dirname(abspath(__file__)), "assets/plan.json")
 
-        with open(example_plan_path, "r") as plan:
-            json_plan = plan.read()
-            self.flattener = flatplan.Flattener(json_plan)
+        with open(example_plan_path, "r") as f:
+            plan = f.read()
+            self.flattener = flatplan.Flattener(plan)
 
     def test_plan_flattener(self) -> None:
-        json_output = self.flattener.flatten()
+        flattened_plan = self.flattener.flatten()
 
-        self.assertIsNotNone(json_output)
-        self.assertIsNot(json_output, "")
+        self.assertIsNotNone(flattened_plan)
+        self.assertIn("providers", flattened_plan.keys())
+        self.assertIn("resources", flattened_plan.keys())
 
-        dict_output = json.loads(json_output)
-
-        self.assertIn("providers", dict_output.keys())
-        self.assertIn("resources", dict_output.keys())
-
-        resources = dict_output["resources"]
+        resources = flattened_plan["resources"]
 
         self.assertEqual(len(resources), 38)
         self.assertEqual(len([r for r in resources if r["mode"] == "managed"]), 29)
         self.assertEqual(len([r for r in resources if r["mode"] == "data"]), 9)
 
-        providers = dict_output["providers"]
+        providers = flattened_plan["providers"]
 
         self.assertEqual(len(providers), 1)

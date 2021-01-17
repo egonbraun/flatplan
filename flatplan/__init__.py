@@ -14,7 +14,11 @@
 # along with Flatplan.  If not, see <https://www.gnu.org/licenses/>.
 
 from .flattener import Flattener
+from .hooks import Hook, HookContext, RemoveResourceByTagHook
 from .main import main
 
-assert Flattener, PlanFlattener
+assert Flattener
+assert Hook
+assert HookContext
+assert RemoveResourceByTagHook
 assert main

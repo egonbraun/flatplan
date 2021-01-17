@@ -256,7 +256,8 @@
 						"name_prefix": "example-01",
 						"revoke_rules_on_delete": false,
 						"tags": {
-							"Name": "example-01-eks_cluster_sg"
+							"Name": "example-01-eks_cluster_sg",
+							"remove": "true"
 						},
 						"timeouts": null,
 						"vpc_id": "vpc-00000000"
@@ -449,7 +450,9 @@
 							"code": "UNSET",
 							"message": "UNSET"
 						},
-						"tags": {},
+						"tags": {
+							"remove": "true"
+						},
 						"virtualization_type": "hvm"
 					}
 				}, {

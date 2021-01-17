@@ -24,7 +24,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="flatplan",
-    version="1.1.0",
+    version="1.2.0",
     description="Flatplan is a tool that groups all resources and providers specified in a Terraform plan file",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -46,7 +46,9 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
     ],
     install_requires=[
-        "colorama", "coloredlogs", "fire",
+        "colorama",
+        "coloredlogs",
+        "fire",
     ],
     extras_require={
         "dev": ["black", "coverage", "pytest", "sphinx", "tox", "twine"],

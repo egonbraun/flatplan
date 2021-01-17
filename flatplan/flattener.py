@@ -14,9 +14,9 @@
 # along with Flatplan.  If not, see <https://www.gnu.org/licenses/>.
 
 from copy import deepcopy
-from json import loads, dumps
+from json import loads
 from logging import Logger
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 from .logging import setup_logger
 
 
@@ -28,26 +28,26 @@ class Flattener:
 
     Methods
     -------
-    flatten() -> str :
+    flatten() -> Dict :
         flattens the plan and returns the processed result
     """
 
     _plan: Any
     _logger: Logger
 
-    def __init__(self, json_plan: str, logger: Optional[Logger] = None) -> None:
+    def __init__(self, plan: str, logger: Optional[Logger] = None) -> None:
         """
         Constructs all the necessary attributes for the Flattener object.
 
         Parameters
         ----------
-        json_plan : str
+        plan : str
             the terraform plan in JSON format
 
         logger : logging.Logger, optional
             the logger object to be used
         """
-        self._plan = loads(json_plan)
+        self._plan = loads(plan)
         self._logger = (
             logger if logger is not None else setup_logger("flatplan", debug=True)
         )
@@ -180,7 +180,7 @@ class Flattener:
 
         return resources
 
-    def flatten(self) -> str:
+    def flatten(self) -> Dict:
         """
         Traverses the plan and creates a new flattened plan with all resources and providers found.
 
@@ -190,7 +190,7 @@ class Flattener:
 
         Returns
         -------
-        flattened_plan : str
+        plan : Dict
         """
         self._logger.debug("Flattening providers")
         providers = self._flatten_providers()
@@ -198,6 +198,4 @@ class Flattener:
         self._logger.debug("Flattening resources")
         resources = self._flatten_resources()
 
-        flattened_plan = dumps({"providers": providers, "resources": resources})
-
-        return flattened_plan
+        return {"providers": providers, "resources": resources}
