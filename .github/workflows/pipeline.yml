@@ -89,7 +89,6 @@ jobs:
       matrix:
         python-version: [ 3.9 ]
         os: [ ubuntu-20.04 ]
-    if: startsWith(github.ref, 'refs/tags/')
     name: Release
     needs: build
     steps:
@@ -109,7 +108,14 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade pipenv==2020.11.15
           pipenv install --dev
+      - name: Release Test
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME_TEST }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD_TEST }}
+        run: |
+          pipenv run release_test
       - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
