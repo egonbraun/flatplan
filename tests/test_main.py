@@ -34,7 +34,7 @@ class TestMain(unittest.TestCase):
             debug=True,
             output=self.output_path,
             path=self.example_plan_path,
-            remove="remove=true"
+            remove="remove=true",
         )
 
         with open(self.output_path) as f:
@@ -53,5 +53,3 @@ class TestMain(unittest.TestCase):
         self.assertNotIn(
             "module.eks-example-01.aws_security_group.cluster[0]", addresses
         )
-
-
