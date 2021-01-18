@@ -13,13 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with Flatplan.  If not, see <https://www.gnu.org/licenses/>.
 
-from .flattener import Flattener
-from .hooks import Hook, HookContext, RemoveResourceByTagHook
-from .main import main, run
+import flatplan.logging
+import logging
+import unittest
 
-assert Flattener
-assert Hook
-assert HookContext
-assert RemoveResourceByTagHook
-assert main
-assert run
+
+class TestLogging(unittest.TestCase):
+    def test_setup_logger(self) -> None:
+        logger = flatplan.logging.setup_logger("flatplan_test")
+
+        self.assertIsNotNone(logger)
+        self.assertIsInstance(logger, logging.Logger)
+        self.assertEqual(logger.level, logging.INFO)
+
+    def test_setup_logger_debug(self) -> None:
+        logger = flatplan.logging.setup_logger("flatplan_test", True)
+
+        self.assertIsNotNone(logger)
+        self.assertIsInstance(logger, logging.Logger)
+        self.assertEqual(logger.level, logging.DEBUG)

@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
+        python-version: [ 3.7, 3.8, 3.9 ]
         os: [ ubuntu-20.04, windows-2019 ]
     name: Test
     needs: lint
@@ -39,19 +39,25 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --upgrade poetry==1.1.4
-          python -m pip install --upgrade pytest==6.1.2
+          python -m pip install --upgrade pipenv==2020.11.15
+          pipenv install --dev
       - name: Test
+        if: ${{ contains(matrix.os, 'ubuntu') }}
         run: |
-          poetry install --no-root
-          poetry run pytest tests/
+          PY_VERSION=`echo ${{ matrix.python-version }} | tr -d "."`
+          pipenv run tox -e "py${PY_VERSION}" -or -p auto
+      - name: Test
+        if: ${{ contains(matrix.os, 'windows') }}
+        run: |
+          $PY_VERSION = "py${{ matrix.python-version }}" -replace "[.]", ""
+          pipenv run tox -e $PY_VERSION -or -p auto
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9]
-        os: [ubuntu-20.04]
+        python-version: [ 3.9 ]
+        os: [ ubuntu-20.04 ]
     name: Build
     needs: test
     steps:
@@ -64,10 +70,11 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --upgrade poetry==1.1.4
+          python -m pip install --upgrade pipenv==2020.11.15
+          pipenv install --dev
       - name: Build
         run: |
-          poetry build
+          pipenv run build
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -80,8 +87,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9]
-        os: [ubuntu-20.04]
+        python-version: [ 3.9 ]
+        os: [ ubuntu-20.04 ]
     if: startsWith(github.ref, 'refs/tags/')
     name: Release
     needs: build
@@ -100,7 +107,11 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --upgrade poetry==1.1.4
+          python -m pip install --upgrade pipenv==2020.11.15
+          pipenv install --dev
       - name: Release
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          poetry publish --username ${{ secrets.PYPI_USERNAME }} --password ${{ secrets.PYPI_PASSWORD }}
+          pipenv run release

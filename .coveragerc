@@ -1,0 +1,9 @@
+[run]
+branch = True
+omit =
+    .tox/*
+source =
+    flatplan/
+
+[report]
+fail_under = 80

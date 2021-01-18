@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 # This file is part of Flatplan.
 #
 # Flatplan is free software: you can redistribute it and/or modify
@@ -15,32 +16,39 @@
 # along with Flatplan.  If not, see <https://www.gnu.org/licenses/>.
 
 import fire
+from json import dumps
 from os.path import expanduser
 from sys import exit, stdin, stdout
 from typing import Optional
 from .configuration import DEFAULT_ENCODING
 from .flattener import Flattener
+from .hooks import HookContext, RemoveResourceByTagHook
 from .logging import setup_logger
 
 
-def _run(
-    jsonplan: Optional[str] = "",
-    output: Optional[str] = "",
+def run(
     debug: Optional[bool] = False,
+    output: Optional[str] = "",
+    path: Optional[str] = "",
+    remove: Optional[str] = "",
 ) -> None:
     """
     Starts the execution of the Flatplan application.
 
     Parameters
     ----------
-    jsonplan : str, optional
-        a path pointing to the location of the terraform plan in JSON format, default it reads from stdin
+    debug : bool, optional
+        whether we show debug log messages or not, default: false
 
     output : str, optional
         a file path where we will save the flattened plan file in JSON format, default it writes to stdout
 
-    debug : bool, optional
-        whether we show debug log messages or not, default: false
+    path : str, optional
+        a path pointing to the location of the terraform plan in JSON format, default it reads from stdin
+
+    remove : str, optional
+        a string containing the name of the tag and the its value separated by an equal sign that will be used to
+        remove resources from the plan, example "remove=true", default is empty
 
     Returns
     -------
@@ -48,30 +56,42 @@ def _run(
     """
 
     logger = setup_logger("flatplan", debug)
-    fp_in = stdin
-    fp_out = stdout
+    f_in = stdin
+    f_out = stdout
 
     logger.debug("Flattening...")
 
-    if jsonplan:
-        logger.debug(f"Reading plan from {jsonplan}")
-        fp_in = open(expanduser(jsonplan), "r", encoding=DEFAULT_ENCODING)
+    if path:
+        logger.debug(f"Reading plan from {path}")
+        f_in = open(expanduser(path), "r", encoding=DEFAULT_ENCODING)
 
     if output:
         logger.debug(f"Output will be saved to {output}")
-        fp_out = open(expanduser(output), "w+", encoding=DEFAULT_ENCODING)
+        f_out = open(expanduser(output), "w+", encoding=DEFAULT_ENCODING)
 
-    json_in = fp_in.read()
-    flattener = Flattener(json_in, logger=logger)
-    json_out = flattener.flatten()
-    fp_out.write(f"{json_out}\n")
-    fp_in.close()
-    fp_out.close()
+    flattener = Flattener(f_in.read(), logger=logger)
+    plan = flattener.flatten()
+
+    context = HookContext(
+        debug=debug, output=output, path=path, plan=plan, remove=remove
+    )
+
+    hooks = [RemoveResourceByTagHook(context, logger)]
+
+    for hook in hooks:
+        plan = hook.run()
+        context.plan = plan
+
+    json_plan = dumps(plan)
+
+    f_out.write(f"{json_plan}\n")
+    f_in.close()
+    f_out.close()
 
     logger.debug("Flattened!")
 
 
-def main() -> None:
+def main() -> None:  # pragma: no cover
     """
     A wrapper for the _run function also providing CLI parameter parsing.
 
@@ -83,9 +103,9 @@ def main() -> None:
     -------
     None.
     """
-    fire.Fire(_run)
+    fire.Fire(run)
     exit(0)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
