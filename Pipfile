@@ -2,6 +2,7 @@
 name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
+skipdist = true
 
 [dev-packages]
 black = "~=20.8b1"
@@ -23,6 +24,7 @@ allow_prereleases = true
 build = "python setup.py sdist bdist_wheel"
 clean = "python setup.py clean"
 docs = "make -C docs html"
+install = "python setup.py install --user"
 lint = "black ."
 release = "twine upload dist/*"
 release_test = "twine upload -r testpypi dist/*"

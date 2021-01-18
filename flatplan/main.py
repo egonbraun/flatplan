@@ -26,7 +26,7 @@ from .hooks import HookContext, RemoveResourceByTagHook
 from .logging import setup_logger
 
 
-def _run(
+def run(
     debug: Optional[bool] = False,
     output: Optional[str] = "",
     path: Optional[str] = "",
@@ -91,7 +91,7 @@ def _run(
     logger.debug("Flattened!")
 
 
-def main() -> None:
+def main() -> None:  # pragma: no cover
     """
     A wrapper for the _run function also providing CLI parameter parsing.
 
@@ -103,9 +103,9 @@ def main() -> None:
     -------
     None.
     """
-    fire.Fire(_run)
+    fire.Fire(run)
     exit(0)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
