@@ -148,16 +148,21 @@ class RemoveResourceByTagHook(Hook):
         -------
         plan : Dict
         """
-        tag, value = self._context.remove.split("=")
-
-        if tag == "":
-            raise Exception(f"Malformed tag in context, {tag}={value}")
-
         plan = self._context.plan
 
         if "resources" not in plan:
             self._logger.debug("Plan does not contain resources section")
             return plan
+
+        try:
+            tag, value = self._context.remove.split("=")
+        except ValueError:
+            if self._context.remove != "":
+                tag = self._context.remove
+                value = ""
+            else:
+                self._logger.debug("Remove tag is empty")
+                return plan
 
         resources = []
 
