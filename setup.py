@@ -24,7 +24,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="flatplan",
-    version="1.1.0",
+    version="1.1.1",
     description="Flatplan is a tool that groups all resources and providers specified in a Terraform plan file",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -32,7 +32,8 @@ setup(
     author="Egon Braun",
     author_email="egon@mundoalem.io",
     keywords="terraform, plan, tools, cli",
-    packages=find_packages("python_project_template"),
+    packages=find_packages(where=".", exclude=("docs", "tests")),
+    package_dir={"flatplan": "flatplan"},
     python_requires=">=3.7, <4",
     classifiers=[
         "Development Status :: 3 - Alpha",
