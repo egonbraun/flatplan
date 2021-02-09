@@ -33,12 +33,12 @@ class HookContext:
     debug: bool
     output: str
     path: str
-    plan: Dict
+    flat: Dict
     remove: str
 
     def __init__(
         self,
-        plan: Dict,
+        flat: Dict,
         debug: Optional[bool] = False,
         output: Optional[str] = "",
         path: Optional[str] = "",
@@ -49,26 +49,26 @@ class HookContext:
 
         Parameters
         ----------
-        plan : Dict
-            the terraform plan after being processed by Flattener class
+        flat : Dict
+            the terraform plan or state after being processed by Flattener class
 
         debug : bool, optional
             whether we show debug log messages or not, default: false
 
         output : str, optional
-            a file path where we will save the flattened plan file in JSON format, default is empty
+            a file path where we will save the flattened plan or state file in JSON format, default is empty
 
         path : str, optional
-            a path pointing to the location of the terraform plan in JSON format, default is empty
+            a path pointing to the location of the terraform plan or state in JSON format, default is empty
 
         remove : str, optional
             a string containing the name of the tag and the its value separated by an equal sign that will be used to
-            remove resources from the plan, example "remove=true", default is empty
+            remove resources from the final result, example "remove=true", default is empty
         """
         self.debug = debug
         self.output = output
         self.path = path
-        self.plan = plan
+        self.flat = flat
         self.remove = remove
 
 
@@ -148,11 +148,11 @@ class RemoveResourceByTagHook(Hook):
         -------
         plan : Dict
         """
-        plan = self._context.plan
+        flat = self._context.flat
 
-        if "resources" not in plan:
-            self._logger.debug("Plan does not contain resources section")
-            return plan
+        if "resources" not in flat:
+            self._logger.debug("Could not find resources section")
+            return flat
 
         try:
             tag, value = self._context.remove.split("=")
@@ -162,11 +162,11 @@ class RemoveResourceByTagHook(Hook):
                 value = ""
             else:
                 self._logger.debug("Remove tag is empty")
-                return plan
+                return flat
 
         resources = []
 
-        for resource in plan["resources"]:
+        for resource in flat["resources"]:
             resource_addr = resource["address"]
 
             self._logger.debug(f"Checking resource '{resource_addr}'")
@@ -195,6 +195,6 @@ class RemoveResourceByTagHook(Hook):
                 )
                 resources.append(resource)
 
-        plan["resources"] = resources
+        flat["resources"] = resources
 
-        return plan
+        return flat

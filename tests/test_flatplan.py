@@ -19,14 +19,13 @@ from os.path import abspath, dirname, join
 
 
 class TestFlatplan(unittest.TestCase):
-    def setUp(self) -> None:
+    def test_plan_flattener(self) -> None:
         example_plan_path = join(dirname(abspath(__file__)), "assets/plan.json")
 
         with open(example_plan_path, "r") as f:
             plan = f.read()
-            self.flattener = flatplan.Flattener(plan)
+            self.flattener = flatplan.PlanFlattener(plan)
 
-    def test_plan_flattener(self) -> None:
         flattened_plan = self.flattener.flatten()
 
         self.assertIsNotNone(flattened_plan)
@@ -42,3 +41,6 @@ class TestFlatplan(unittest.TestCase):
         providers = flattened_plan["providers"]
 
         self.assertEqual(len(providers), 1)
+
+    def test_state_flattener(self) -> None:
+        pass

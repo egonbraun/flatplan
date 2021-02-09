@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Flatplan.  If not, see <https://www.gnu.org/licenses/>.
 
-from .flattener import Flattener
+from .flattener import Flattener, PlanFlattener, StateFlattener
 from .hooks import Hook, HookContext, RemoveResourceByTagHook
 from .main import main, run
 
 assert Flattener
+assert PlanFlattener
+assert StateFlattener
 assert Hook
 assert HookContext
 assert RemoveResourceByTagHook

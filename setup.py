@@ -24,14 +24,14 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="flatplan",
-    version="1.1.2",
-    description="Flatplan is a tool that groups all resources and providers specified in a Terraform plan file",
+    version="1.2.0",
+    description="Flatplan is a tool that groups all resources and providers specified in a Terraform plan or state file",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/egonbraun/python-project-template",
     author="Egon Braun",
     author_email="egon@mundoalem.io",
-    keywords="terraform, plan, tools, cli",
+    keywords="terraform, plan, state, tools, cli",
     packages=find_packages(where=".", exclude=("docs", "tests")),
     package_dir={"flatplan": "flatplan"},
     python_requires=">=3.7, <4",

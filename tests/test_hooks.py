@@ -19,18 +19,17 @@ from os.path import abspath, dirname, join
 
 
 class TestHooks(unittest.TestCase):
-    def setUp(self) -> None:
+    def test_remove_resource_from_plan_by_tag_hook(self) -> None:
         self.example_plan_path = join(dirname(abspath(__file__)), "assets/plan.json")
 
         with open(self.example_plan_path, "r") as f:
             plan = f.read()
-            self.flattened_plan = flatplan.Flattener(plan).flatten()
+            self.flattened_plan = flatplan.PlanFlattener(plan).flatten()
 
-    def test_remove_resource_by_tag_hook(self) -> None:
         context = flatplan.HookContext(
             debug=False,
             path=self.example_plan_path,
-            plan=self.flattened_plan,
+            flat=self.flattened_plan,
             remove="remove=true",
         )
 
@@ -47,3 +46,6 @@ class TestHooks(unittest.TestCase):
         self.assertNotIn(
             "module.eks-example-01.aws_security_group.cluster[0]", addresses
         )
+
+    def test_remove_resource_from_state_by_tag_hook(self) -> None:
+        pass
