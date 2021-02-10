@@ -16,7 +16,7 @@ terraform show -json planfile > plan.json
 Now, we can feed our exported JSON plan to flatplan:
 
 ```bash
-flatplan --plan=plan.json --output=flattened_plan.json --debug
+flatplan --path=plan.json --output=flattened_plan.json --debug
 ```
 
 The problem we are trying to solve with flatplan is that, when you export the plan or state to JSON the resources might
@@ -117,7 +117,7 @@ Flatplan accepts the following command line parameters:
 
 `--output="path"` Writes flattened plan to the specified path, default: STDOUT.
 
-`--plan="path"` Reads JSON plan from the specified path, default: STDIN.
+`--path="path"` Reads JSON plan from the specified path, default: STDIN.
 
 `--remove="tag=value"` Removes the resources that contain a certain tag, default: empty
 

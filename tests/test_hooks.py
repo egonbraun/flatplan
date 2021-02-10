@@ -19,18 +19,23 @@ from os.path import abspath, dirname, join
 
 
 class TestHooks(unittest.TestCase):
-    def test_remove_resource_from_plan_by_tag_hook(self) -> None:
+    def setUp(self) -> None:
         self.example_plan_path = join(dirname(abspath(__file__)), "assets/plan.json")
+        self.example_state_path = join(dirname(abspath(__file__)), "assets/state.json")
 
+    def test_remove_resource_from_plan_by_tag_hook(self) -> None:
         with open(self.example_plan_path, "r") as f:
             plan = f.read()
-            self.flattened_plan = flatplan.PlanFlattener(plan).flatten()
+
+        flattener = flatplan.PlanFlattener(plan)
+        flattened_plan = flattener.flatten()
 
         context = flatplan.HookContext(
             debug=False,
             path=self.example_plan_path,
-            flat=self.flattened_plan,
+            flat=flattened_plan,
             remove="remove=true",
+            state=False,
         )
 
         hook = flatplan.RemoveResourceByTagHook(context)
@@ -48,4 +53,26 @@ class TestHooks(unittest.TestCase):
         )
 
     def test_remove_resource_from_state_by_tag_hook(self) -> None:
-        pass
+        with open(self.example_state_path, "r") as f:
+            plan = f.read()
+
+        flattener = flatplan.StateFlattener(plan)
+        flattened_plan = flattener.flatten()
+
+        context = flatplan.HookContext(
+            debug=False,
+            path=self.example_plan_path,
+            flat=flattened_plan,
+            remove="remove=true",
+            state=True,
+        )
+
+        hook = flatplan.RemoveResourceByTagHook(context)
+        plan = hook.run()
+
+        self.assertIsNotNone(plan)
+        self.assertIn("resources", plan.keys())
+
+        addresses = [r["address"] for r in plan["resources"]]
+
+        self.assertNotIn("aws_kms_key.kms01", addresses)

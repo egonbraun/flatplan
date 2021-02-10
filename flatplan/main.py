@@ -80,7 +80,7 @@ def run(
     flat = flattener.flatten()
 
     context = HookContext(
-        debug=debug, output=output, path=path, flat=flat, remove=remove
+        debug=debug, output=output, path=path, flat=flat, remove=remove, state=state
     )
 
     hooks = [RemoveResourceByTagHook(context, logger)]

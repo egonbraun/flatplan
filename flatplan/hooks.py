@@ -35,6 +35,7 @@ class HookContext:
     path: str
     flat: Dict
     remove: str
+    state: bool
 
     def __init__(
         self,
@@ -43,6 +44,7 @@ class HookContext:
         output: Optional[str] = "",
         path: Optional[str] = "",
         remove: Optional[str] = "",
+        state: Optional[bool] = False,
     ) -> None:
         """
         Constructs all the necessary attributes for the HookContext object.
@@ -64,12 +66,64 @@ class HookContext:
         remove : str, optional
             a string containing the name of the tag and the its value separated by an equal sign that will be used to
             remove resources from the final result, example "remove=true", default is empty
+
+        state : bool, optional
+            whether the file passed in the path option is a state file instead of a plan file, default: false
         """
         self.debug = debug
         self.output = output
         self.path = path
         self.flat = flat
         self.remove = remove
+        self.state = state
+
+    @property
+    def debug(self) -> bool:
+        return self.__debug
+
+    @debug.setter
+    def debug(self, value: bool) -> None:
+        self.__debug = value
+
+    @property
+    def output(self) -> str:
+        return self.__output
+
+    @output.setter
+    def output(self, value: str) -> None:
+        self.__output = value
+
+    @property
+    def path(self) -> str:
+        return self.__path
+
+    @path.setter
+    def path(self, value: str) -> None:
+        self.__path = value
+
+    @property
+    def flat(self) -> Dict:
+        return self.__flat
+
+    @flat.setter
+    def flat(self, value: Dict) -> None:
+        self.__flat = value
+
+    @property
+    def remove(self) -> str:
+        return self.__remove
+
+    @remove.setter
+    def remove(self, value: str) -> None:
+        self.__remove = value
+
+    @property
+    def state(self) -> bool:
+        return self.__state
+
+    @state.setter
+    def state(self, value: bool) -> None:
+        self.__state = value
 
 
 class Hook(ABC):
@@ -85,6 +139,7 @@ class Hook(ABC):
     """
 
     _context: HookContext
+    _logger: Logger
 
     def __init__(self, context: HookContext, logger: Optional[Logger] = None) -> None:
         """

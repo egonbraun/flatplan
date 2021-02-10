@@ -283,11 +283,16 @@ class StateFlattener(Flattener):
         self._logger.debug("Flattening resources")
         resources = []
 
-        if "root_module" in self._state.keys():
-            root_module = self._state["root_module"]
+        if "values" in self._state.keys():
+            values = self._state["values"]
 
-            resources.extend(self._flatten_resources(root_module))
+            if "root_module" in values.keys():
+                root_module = values["root_module"]
+
+                resources.extend(self._flatten_resources(root_module))
+            else:
+                self._logger.warning("State does not have 'root_module' section")
         else:
-            self._logger.warning("State does not have 'root_module' section")
+            self._logger.warning("State does not have 'values' section")
 
         return {"resources": resources}
