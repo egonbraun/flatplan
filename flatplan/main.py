@@ -21,7 +21,7 @@ from os.path import expanduser
 from sys import exit, stdin, stdout
 from typing import Optional
 from .configuration import DEFAULT_ENCODING
-from .flattener import Flattener
+from .flattener import PlanFlattener, StateFlattener
 from .hooks import HookContext, RemoveResourceByTagHook
 from .logging import setup_logger
 
@@ -31,6 +31,7 @@ def run(
     output: Optional[str] = "",
     path: Optional[str] = "",
     remove: Optional[str] = "",
+    state: Optional[bool] = False,
 ) -> None:
     """
     Starts the execution of the Flatplan application.
@@ -50,11 +51,13 @@ def run(
         a string containing the name of the tag and the its value separated by an equal sign that will be used to
         remove resources from the plan, example "remove=true", default is empty
 
+    state: bool, optional
+        whether the file passed in the path option is a state file instead of a plan file, default: false
+
     Returns
     -------
     None.
     """
-
     logger = setup_logger("flatplan", debug)
     f_in = stdin
     f_out = stdout
@@ -69,11 +72,15 @@ def run(
         logger.debug(f"Output will be saved to {output}")
         f_out = open(expanduser(output), "w+", encoding=DEFAULT_ENCODING)
 
-    flattener = Flattener(f_in.read(), logger=logger)
-    plan = flattener.flatten()
+    if not state:
+        flattener = PlanFlattener(f_in.read(), logger=logger)
+    else:
+        flattener = StateFlattener(f_in.read(), logger=logger)
+
+    flat = flattener.flatten()
 
     context = HookContext(
-        debug=debug, output=output, path=path, plan=plan, remove=remove
+        debug=debug, output=output, path=path, flat=flat, remove=remove, state=state
     )
 
     hooks = [RemoveResourceByTagHook(context, logger)]
@@ -82,9 +89,9 @@ def run(
         plan = hook.run()
         context.plan = plan
 
-    json_plan = dumps(plan)
+    json_flat = dumps(flat)
 
-    f_out.write(f"{json_plan}\n")
+    f_out.write(f"{json_flat}\n")
     f_in.close()
     f_out.close()
 

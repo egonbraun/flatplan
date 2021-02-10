@@ -33,43 +33,97 @@ class HookContext:
     debug: bool
     output: str
     path: str
-    plan: Dict
+    flat: Dict
     remove: str
+    state: bool
 
     def __init__(
         self,
-        plan: Dict,
+        flat: Dict,
         debug: Optional[bool] = False,
         output: Optional[str] = "",
         path: Optional[str] = "",
         remove: Optional[str] = "",
+        state: Optional[bool] = False,
     ) -> None:
         """
         Constructs all the necessary attributes for the HookContext object.
 
         Parameters
         ----------
-        plan : Dict
-            the terraform plan after being processed by Flattener class
+        flat : Dict
+            the terraform plan or state after being processed by Flattener class
 
         debug : bool, optional
             whether we show debug log messages or not, default: false
 
         output : str, optional
-            a file path where we will save the flattened plan file in JSON format, default is empty
+            a file path where we will save the flattened plan or state file in JSON format, default is empty
 
         path : str, optional
-            a path pointing to the location of the terraform plan in JSON format, default is empty
+            a path pointing to the location of the terraform plan or state in JSON format, default is empty
 
         remove : str, optional
             a string containing the name of the tag and the its value separated by an equal sign that will be used to
-            remove resources from the plan, example "remove=true", default is empty
+            remove resources from the final result, example "remove=true", default is empty
+
+        state : bool, optional
+            whether the file passed in the path option is a state file instead of a plan file, default: false
         """
         self.debug = debug
         self.output = output
         self.path = path
-        self.plan = plan
+        self.flat = flat
         self.remove = remove
+        self.state = state
+
+    @property
+    def debug(self) -> bool:
+        return self.__debug
+
+    @debug.setter
+    def debug(self, value: bool) -> None:
+        self.__debug = value
+
+    @property
+    def output(self) -> str:
+        return self.__output
+
+    @output.setter
+    def output(self, value: str) -> None:
+        self.__output = value
+
+    @property
+    def path(self) -> str:
+        return self.__path
+
+    @path.setter
+    def path(self, value: str) -> None:
+        self.__path = value
+
+    @property
+    def flat(self) -> Dict:
+        return self.__flat
+
+    @flat.setter
+    def flat(self, value: Dict) -> None:
+        self.__flat = value
+
+    @property
+    def remove(self) -> str:
+        return self.__remove
+
+    @remove.setter
+    def remove(self, value: str) -> None:
+        self.__remove = value
+
+    @property
+    def state(self) -> bool:
+        return self.__state
+
+    @state.setter
+    def state(self, value: bool) -> None:
+        self.__state = value
 
 
 class Hook(ABC):
@@ -85,6 +139,7 @@ class Hook(ABC):
     """
 
     _context: HookContext
+    _logger: Logger
 
     def __init__(self, context: HookContext, logger: Optional[Logger] = None) -> None:
         """
@@ -148,11 +203,11 @@ class RemoveResourceByTagHook(Hook):
         -------
         plan : Dict
         """
-        plan = self._context.plan
+        flat = self._context.flat
 
-        if "resources" not in plan:
-            self._logger.debug("Plan does not contain resources section")
-            return plan
+        if "resources" not in flat:
+            self._logger.debug("Could not find resources section")
+            return flat
 
         try:
             tag, value = self._context.remove.split("=")
@@ -162,11 +217,11 @@ class RemoveResourceByTagHook(Hook):
                 value = ""
             else:
                 self._logger.debug("Remove tag is empty")
-                return plan
+                return flat
 
         resources = []
 
-        for resource in plan["resources"]:
+        for resource in flat["resources"]:
             resource_addr = resource["address"]
 
             self._logger.debug(f"Checking resource '{resource_addr}'")
@@ -195,6 +250,6 @@ class RemoveResourceByTagHook(Hook):
                 )
                 resources.append(resource)
 
-        plan["resources"] = resources
+        flat["resources"] = resources
 
-        return plan
+        return flat

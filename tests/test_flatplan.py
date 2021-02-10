@@ -20,14 +20,15 @@ from os.path import abspath, dirname, join
 
 class TestFlatplan(unittest.TestCase):
     def setUp(self) -> None:
-        example_plan_path = join(dirname(abspath(__file__)), "assets/plan.json")
-
-        with open(example_plan_path, "r") as f:
-            plan = f.read()
-            self.flattener = flatplan.Flattener(plan)
+        self.example_plan_path = join(dirname(abspath(__file__)), "assets/plan.json")
+        self.example_state_path = join(dirname(abspath(__file__)), "assets/state.json")
 
     def test_plan_flattener(self) -> None:
-        flattened_plan = self.flattener.flatten()
+        with open(self.example_plan_path, "r") as f:
+            plan = f.read()
+
+        flattener = flatplan.PlanFlattener(plan)
+        flattened_plan = flattener.flatten()
 
         self.assertIsNotNone(flattened_plan)
         self.assertIn("providers", flattened_plan.keys())
@@ -42,3 +43,19 @@ class TestFlatplan(unittest.TestCase):
         providers = flattened_plan["providers"]
 
         self.assertEqual(len(providers), 1)
+
+    def test_state_flattener(self) -> None:
+        with open(self.example_state_path, "r") as f:
+            plan = f.read()
+
+        flattener = flatplan.StateFlattener(plan)
+        flattened_plan = flattener.flatten()
+
+        self.assertIsNotNone(flattened_plan)
+        self.assertIn("resources", flattened_plan.keys())
+
+        resources = flattened_plan["resources"]
+
+        self.assertEqual(len(resources), 6)
+        self.assertEqual(len([r for r in resources if r["mode"] == "managed"]), 5)
+        self.assertEqual(len([r for r in resources if r["mode"] == "data"]), 1)
