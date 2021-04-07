@@ -136,7 +136,7 @@
                         "policy": "{\"Id\":\"key-default-1\",\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::000000000000:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"}],\"Version\":\"2012-10-17\"}",
                         "tags": {
                             "Name": "kms01",
-                            "remove": "true"
+                            "remove": true
                         }
                     }
                 },

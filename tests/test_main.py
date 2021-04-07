@@ -66,15 +66,15 @@ class TestMain(unittest.TestCase):
         )
 
         with open(self.output_state_path) as f:
-            flattened_plan = loads(f.read())
+            flattened_state = loads(f.read())
 
         remove(self.output_state_path)
 
-        self.assertIsNotNone(flattened_plan)
-        self.assertIn("resources", flattened_plan.keys())
+        self.assertIsNotNone(flattened_state)
+        self.assertIn("resources", flattened_state.keys())
 
-        self.assertEqual(len(flattened_plan["resources"]), 5)
+        self.assertEqual(len(flattened_state["resources"]), 5)
 
-        addresses = [r["address"] for r in flattened_plan["resources"]]
+        addresses = [r["address"] for r in flattened_state["resources"]]
 
         self.assertNotIn("aws_kms_key.kms01", addresses)

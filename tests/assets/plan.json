@@ -257,7 +257,7 @@
 						"revoke_rules_on_delete": false,
 						"tags": {
 							"Name": "example-01-eks_cluster_sg",
-							"remove": "true"
+							"remove": true
 						},
 						"timeouts": null,
 						"vpc_id": "vpc-00000000"
@@ -451,7 +451,7 @@
 							"message": "UNSET"
 						},
 						"tags": {
-							"remove": "true"
+							"remove": true
 						},
 						"virtualization_type": "hvm"
 					}
