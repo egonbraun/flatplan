@@ -24,7 +24,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="flatplan",
-    version="1.2.0",
+    version="1.2.1",
     description="Flatplan is a tool that groups all resources and providers specified in a Terraform plan or state file",
     long_description=long_description,
     long_description_content_type="text/markdown",
