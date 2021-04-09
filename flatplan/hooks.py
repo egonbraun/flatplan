@@ -14,6 +14,7 @@
 # along with Flatplan.  If not, see <https://www.gnu.org/licenses/>.
 
 from abc import ABC, abstractmethod
+from distutils.util import strtobool
 from logging import Logger
 from typing import Dict, Optional
 from .logging import setup_logger
@@ -191,6 +192,27 @@ class RemoveResourceByTagHook(Hook):
         runs the hook
     """
 
+    def is_tag_present(self, tags: Dict, tag: str, value: str) -> bool:
+        if tag not in tags:
+            return False
+
+        try:
+            if isinstance(tags[tag], bool):
+                return tags[tag] == bool(strtobool(value))
+
+            if isinstance(tags[tag], str):
+                return tags[tag] == value
+
+            if isinstance(tags[tag], int):
+                return tags[tag] == int(value)
+
+            if isinstance(tags[tag], float):
+                return tags[tag] == float(value)
+        except ValueError:
+            return False
+
+        return False
+
     def run(self) -> Dict:
         """
         Traverses the plan and removes the resources that contain a certain tag.
@@ -230,7 +252,7 @@ class RemoveResourceByTagHook(Hook):
                 tags = resource["values"]["tags"]
 
                 if tags is not None:
-                    if tag not in tags or tags[tag] != value:
+                    if not self.is_tag_present(tags, tag, value):
                         self._logger.debug(
                             f"Resource '{resource_addr}' does not meet criteria to be removed"
                         )
