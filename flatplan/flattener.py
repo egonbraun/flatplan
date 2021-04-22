@@ -40,7 +40,6 @@ class LoggerMixin:  # pylint: disable=too-few-public-methods
 
 
 class Flattener(ABC, LoggerMixin):
-
     def _flatten_child_modules(self, modules: List) -> List:
         """
         Recursively traverses the child modules and creates a list with all resources found.
@@ -76,9 +75,7 @@ class Flattener(ABC, LoggerMixin):
             if "child_modules" in module.keys():
                 resources.extend(self._flatten_child_modules(module["child_modules"]))
             else:
-                self.logger.debug(
-                    f"No child modules found in module: {module_address}"
-                )
+                self.logger.debug(f"No child modules found in module: {module_address}")
 
         return resources
 
