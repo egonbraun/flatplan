@@ -73,9 +73,9 @@ def run(
         f_out = open(expanduser(output), "w+", encoding=DEFAULT_ENCODING)
 
     if not state:
-        flattener = PlanFlattener(f_in.read(), logger=logger)
+        flattener = PlanFlattener(f_in.read())
     else:
-        flattener = StateFlattener(f_in.read(), logger=logger)
+        flattener = StateFlattener(f_in.read())
 
     flat = flattener.flatten()
 
