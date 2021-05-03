@@ -16,37 +16,30 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from json import loads
-from logging import Logger
-from typing import Any, Dict, List, Optional
-from .logging import setup_logger
+import logging
+from typing import Any, Dict, List
+
+# This is the main prefix used for logging
+LOGGER_BASENAME = """flatplan"""
+LOGGER = logging.getLogger(LOGGER_BASENAME)
+LOGGER.addHandler(logging.NullHandler())
 
 
-class Flattener(ABC):
-    """
-    An abstract class that can be used to build specific resources flatteners for Terraform.
+class LoggerMixin:  # pylint: disable=too-few-public-methods
+    """Logger."""
 
-    ...
+    @property
+    def logger(self):
+        """Exposes the logger to be used by objects using the Mixin.
 
-    Methods
-    -------
-    flatten() -> Dict :
-    """
+        Returns:
+            logger (logger): The properly named logger.
 
-    _logger: Logger
-
-    def __init__(self, logger: Optional[Logger] = None) -> None:
         """
-        Constructs all the necessary attributes for the Flattener object.
+        return logging.getLogger(f"{LOGGER_BASENAME}.{self.__class__.__name__}")
 
-        Parameters
-        ----------
-        logger : logging.Logger, optional
-            the logger object to be used
-        """
-        self._logger = (
-            logger if logger is not None else setup_logger("flatplan", debug=True)
-        )
 
+class Flattener(ABC, LoggerMixin):
     def _flatten_child_modules(self, modules: List) -> List:
         """
         Recursively traverses the child modules and creates a list with all resources found.
@@ -74,17 +67,15 @@ class Flattener(ABC):
                         if "address" in resource.keys()
                         else "unknown"
                     )
-                    self._logger.debug(f"Adding resource: {resource_address}")
+                    self.logger.debug(f"Adding resource: {resource_address}")
                     resources.append(deepcopy(resource))
             else:
-                self._logger.debug(f"No resources found in module: {module_address}")
+                self.logger.debug(f"No resources found in module: {module_address}")
 
             if "child_modules" in module.keys():
                 resources.extend(self._flatten_child_modules(module["child_modules"]))
             else:
-                self._logger.debug(
-                    f"No child modules found in module: {module_address}"
-                )
+                self.logger.debug(f"No child modules found in module: {module_address}")
 
         return resources
 
@@ -107,10 +98,10 @@ class Flattener(ABC):
                 resource_address = (
                     resource["address"] if "address" in resource.keys() else "unknown"
                 )
-                self._logger.debug(f"Adding resource: {resource_address}")
+                self.logger.debug(f"Adding resource: {resource_address}")
                 resources.append(deepcopy(resource))
         else:
-            self._logger.warning("Could not find 'resources' section under root module")
+            self.logger.warning("Could not find 'resources' section under root module")
 
         if "child_modules" in root_module.keys():
             child_modules_resources = self._flatten_child_modules(
@@ -118,7 +109,7 @@ class Flattener(ABC):
             )
             resources.extend(child_modules_resources)
         else:
-            self._logger.debug(
+            self.logger.debug(
                 "Could not find 'child_modules' section under root module"
             )
 
@@ -154,7 +145,7 @@ class PlanFlattener(Flattener):
 
     _plan: Any
 
-    def __init__(self, plan: str, logger: Optional[Logger] = None) -> None:
+    def __init__(self, plan: str) -> None:
         """
         Constructs all the necessary attributes for the PlanFlattener object.
 
@@ -162,11 +153,7 @@ class PlanFlattener(Flattener):
         ----------
         plan : str
             the terraform plan in JSON format
-
-        logger : logging.Logger, optional
-            the logger object to be used
         """
-        super().__init__(logger=logger)
         self._plan = loads(plan)
 
     def _flatten_providers(self) -> List:
@@ -193,14 +180,14 @@ class PlanFlattener(Flattener):
                     provider_name = (
                         provider["name"] if "name" in provider.keys() else "unknown"
                     )
-                    self._logger.debug(f"Adding provider: {provider_name}")
+                    self.logger.debug(f"Adding provider: {provider_name}")
                     providers.append(deepcopy(provider))
             else:
-                self._logger.warning(
+                self.logger.warning(
                     "Plan does not have 'provider_config' section under 'configuration'"
                 )
         else:
-            self._logger.warning("Plan does not have 'configuration' section")
+            self.logger.warning("Plan does not have 'configuration' section")
 
         return providers
 
@@ -216,10 +203,10 @@ class PlanFlattener(Flattener):
         -------
         plan : Dict
         """
-        self._logger.debug("Flattening providers")
+        self.logger.debug("Flattening providers")
         providers = self._flatten_providers()
 
-        self._logger.debug("Flattening resources")
+        self.logger.debug("Flattening resources")
         resources = []
 
         if "planned_values" in self._plan.keys():
@@ -230,11 +217,11 @@ class PlanFlattener(Flattener):
 
                 resources.extend(self._flatten_resources(root_module))
             else:
-                self._logger.warning(
+                self.logger.warning(
                     "Plan does not have 'root_module' section under 'planned_values'"
                 )
         else:
-            self._logger.warning("Plan does not have 'planned_values' section")
+            self.logger.warning("Plan does not have 'planned_values' section")
 
         return {"providers": providers, "resources": resources}
 
@@ -253,7 +240,7 @@ class StateFlattener(Flattener):
 
     _state: Any
 
-    def __init__(self, state: str, logger: Optional[Logger] = None) -> None:
+    def __init__(self, state: str) -> None:
         """
         Constructs all the necessary attributes for the StateFlattener object.
 
@@ -261,11 +248,7 @@ class StateFlattener(Flattener):
         ----------
         state : str
             the terraform plan in JSON format
-
-        logger : logging.Logger, optional
-            the logger object to be used
         """
-        super().__init__(logger=logger)
         self._state = loads(state)
 
     def flatten(self) -> Dict:
@@ -280,7 +263,7 @@ class StateFlattener(Flattener):
         -------
         state : Dict
         """
-        self._logger.debug("Flattening resources")
+        self.logger.debug("Flattening resources")
         resources = []
 
         if "values" in self._state.keys():
@@ -291,8 +274,8 @@ class StateFlattener(Flattener):
 
                 resources.extend(self._flatten_resources(root_module))
             else:
-                self._logger.warning("State does not have 'root_module' section")
+                self.logger.warning("State does not have 'root_module' section")
         else:
-            self._logger.warning("State does not have 'values' section")
+            self.logger.warning("State does not have 'values' section")
 
         return {"resources": resources}
